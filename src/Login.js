@@ -57,7 +57,10 @@ function PhoneAuth() {
                             <h3 className="text-center mb-4">Login with Phone Number</h3>
                             {!show && <Form onSubmit={signin}>
                                 <Form.Label>Enter your phone number:</Form.Label>
-                                <Form.Control type="tel" placeholder="Enter phone number" value={mynumber} onChange={(e) => setnumber(e.target.value)} />
+                                <div className="input-group">
+                                    <span className="input-group-text">+91</span>
+                                    <Form.Control type="tel" placeholder="Enter phone number" value={mynumber} onChange={(e) => setnumber(e.target.value)} />
+                                </div>
                                 <div id="recaptcha-container"></div>
                                 <Button type='submit' variant="primary" className="w-100 mt-3">Send OTP</Button>
                             </Form>}
