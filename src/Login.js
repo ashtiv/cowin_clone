@@ -2,93 +2,79 @@ import React, { useState } from 'react';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
 import { auth } from './firebase';
+import { useDispatch } from 'react-redux';
+import { updateUserData } from './actions';
+import { useNavigate } from "react-router-dom";
+import { Container, Row, Col, Form, Button, Card } from 'react-bootstrap';
 
 function PhoneAuth() {
-    const [phoneNumber, setPhoneNumber] = useState('');
-    const [verificationCode, setVerificationCode] = useState('');
-    const [verificationId, setVerificationId] = useState(null);
-    const [recaptchaShown, setrecaptchaShown] = useState(true);
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
 
-    function handlePhoneChange(event) {
-        setPhoneNumber(event.target.value);
-    }
+    const [mynumber, setnumber] = useState("");
+    const [otp, setotp] = useState('');
+    const [show, setshow] = useState(false);
+    const [final, setfinal] = useState('');
 
-    function handleCodeChange(event) {
-        setVerificationCode(event.target.value);
-    }
+    // Sent OTP
+    const signin = (event) => {
+        event.preventDefault()
+        if (mynumber === "" || mynumber.length < 10) return;
 
-    async function handleSubmit(event) {
-        event.preventDefault();
-        const appVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container');
-        const formattedPhoneNumber = `+91${phoneNumber}`;
-        auth.signInWithPhoneNumber(formattedPhoneNumber, appVerifier)
-            .then((confirmationResult) => {
-                setrecaptchaShown(false);
-                setVerificationId(confirmationResult.verificationId);
-            })
-            .catch((error) => {
-                console.error(error);
+        let verify = new firebase.auth.RecaptchaVerifier('recaptcha-container');
+        auth.signInWithPhoneNumber("+91" + mynumber, verify).then((result) => {
+            setfinal(result);
+            alert("code sent")
+            setshow(true);
+        })
+            .catch((err) => {
+                alert(err);
+                window.location.reload()
             });
     }
 
-    function handleSignIn(event) {
+    // Validate OTP
+    const ValidateOtp = (event) => {
         event.preventDefault();
-
-        const credential = firebase.auth.PhoneAuthProvider.credential(
-            verificationId,
-            verificationCode
-        );
-
-        auth.signInWithCredential(credential)
-            .then((userCredential) => {
-                const uid = userCredential.user.multiFactor.user.uid;
-                console.log(uid);
-            })
-            .catch((error) => {
-                console.error(error);
-            });
+        if (otp === null || final === null)
+            return;
+        final.confirm(otp).then((result) => {
+            const uid = result.user.multiFactor.user.uid
+            console.log(uid)
+            dispatch(updateUserData(uid, "+91" + mynumber));
+            navigate('/dashboard');
+        }).catch((err) => {
+            console.log(err)
+        })
     }
 
     return (
-        <div className="container my-4">
-            <div className="row justify-content-center">
-                <div className="col-md-8">
-                    <div className="card">
-                        <div className="card-header bg-primary text-white">
-                            <h5 className="mb-0">Phone Number Verification</h5>
-                        </div>
-                        <div className="card-body">
-                            <form onSubmit={handleSubmit}>
-                                <div className="mb-3">
-                                    <label htmlFor="phone" className="form-label">Phone Number</label>
-                                    <div className="input-group mb-3">
-                                        <span className="input-group-text">+91</span>
-                                        <input type="tel" className="form-control" id="phone" value={phoneNumber} onChange={handlePhoneChange} placeholder="Enter your 10-digit phone number" required />
-                                    </div>
-                                </div>
-                                <div className="d-grid gap-2 mb-3">
-                                    <button type="submit" className="btn btn-primary">Send Verification Code</button>
-                                </div>
-                            </form>
-                            {verificationId && (
-                                <form onSubmit={handleSignIn}>
-                                    <div className="mb-3">
-                                        <label htmlFor="code" className="form-label">Verification Code</label>
-                                        <input type="number" className="form-control" id="code" value={verificationCode} onChange={handleCodeChange} placeholder="Enter the verification code sent to your phone" required />
-                                    </div>
-                                    <div className="d-grid gap-2 mb-3">
-                                        <button type="submit" className="btn btn-primary">Verify</button>
-                                    </div>
-                                </form>
+        <Container fluid className="bg-white py-5">
+            <Row className="justify-content-center">
+                <Col md={6}>
+                    <Card>
+                        <Card.Body>
+                            <h3 className="text-center mb-4">Login with Phone Number</h3>
+                            {!show && <Form onSubmit={signin}>
+                                <Form.Label>Enter your phone number:</Form.Label>
+                                <Form.Control type="tel" placeholder="Enter phone number" value={mynumber} onChange={(e) => setnumber(e.target.value)} />
+                                <div id="recaptcha-container"></div>
+                                <Button type='submit' variant="primary" className="w-100 mt-3">Send OTP</Button>
+                            </Form>}
+
+
+                            {show && (
+                                <Form className="mt-4" onSubmit={ValidateOtp}>
+                                    <Form.Label>Enter the OTP sent to your phone:</Form.Label>
+                                    <Form.Control type="text" placeholder="Enter OTP" value={otp} onChange={(e) => setotp(e.target.value)} />
+                                    <Button type='submit' variant="success" className="w-100mt-3">Verify OTP</Button>
+                                </Form>
                             )}
-                            {recaptchaShown && (
-                                <div id="recaptcha-container" className="mb-3"></div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                        </Card.Body>
+                    </Card>
+                </Col>
+            </Row>
+        </Container>
     );
 }
 
