@@ -10,6 +10,8 @@ function Dashboard() {
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [dob, setDob] = useState('');
+    const [aadhaarNumber, setAadhaarNumber] = useState('');
+    const [aadhaarError, setAadhaarError] = useState('');
     const dispatch = useDispatch();
 
     const handleAddMember = () => {
@@ -19,6 +21,7 @@ function Dashboard() {
         setFirstName('');
         setLastName('');
         setDob('');
+        setAadhaarNumber('');
         setShowForm(false);
     };
 
@@ -28,6 +31,7 @@ function Dashboard() {
         setFirstName('');
         setLastName('');
         setDob('');
+        setAadhaarNumber('');
         setShowForm(false);
     };
 
@@ -103,6 +107,34 @@ function Dashboard() {
                                                         onChange={(event) => setDob(event.target.value)}
                                                         required
                                                     />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="row">
+                                            <div className="col-md-12">
+                                                <div className="form-group">
+                                                    <label htmlFor="aadhaarNumber">Aadhaar Number:</label>
+                                                    <input
+                                                        type="text"
+                                                        className="form-control"
+                                                        id="aadhaarNumber"
+                                                        value={aadhaarNumber}
+                                                        onChange={(event) => {
+                                                            const input = event.target.value;
+                                                            if (/^\d{0,12}$/.test(input)) {
+                                                                setAadhaarNumber(input);
+                                                                setAadhaarError('');
+                                                            } else {
+                                                                setAadhaarNumber(input);
+                                                                setAadhaarError('Please enter a valid Aadhaar number');
+                                                            }
+                                                        }}
+                                                        // maxLength={12}
+                                                        required
+                                                    />
+                                                    {aadhaarError && (
+                                                        <div className="text-danger">{aadhaarError}</div>
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>
