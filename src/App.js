@@ -16,7 +16,9 @@ function App() {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user && user.multiFactor) {
         const currentUserUid = user.multiFactor.user.uid;
-        dispatch(updateUserData(currentUserUid, ""));
+        const phoneNumber = user.multiFactor.user.phoneNumber;
+        // console.log(user?.multiFactor?.user?.phoneNumber, " uuuuuuuuuuuuuuuu")
+        dispatch(updateUserData(currentUserUid, phoneNumber));
         setIsLoggedIn(true);
       } else {
         setIsLoggedIn(false);

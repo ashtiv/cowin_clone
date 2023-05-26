@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { auth } from './firebase';
 import { updateUserData } from './actions';
+import instance from './axios';
+import axios from 'axios';
 
 function Dashboard() {
     const phoneNumber = useSelector((state) => state.phoneNumber);
@@ -9,10 +11,21 @@ function Dashboard() {
     const [showForm, setShowForm] = useState(false);
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
+    const [persons, setPersons] = useState([]);
     const [dob, setDob] = useState('');
     const [aadhaarNumber, setAadhaarNumber] = useState('');
     const [aadhaarError, setAadhaarError] = useState('');
     const dispatch = useDispatch();
+
+    useEffect(() => {
+        if (uid) {
+            const fetchPersons = async () => {
+                const data = await getAllPerson(uid);
+                setPersons(data);
+            };
+            fetchPersons();
+        }
+    }, [uid]);
 
     const handleAddMember = () => {
         setShowForm(true);
@@ -24,21 +37,79 @@ function Dashboard() {
         setAadhaarNumber('');
         setShowForm(false);
     };
+    function validateAadhaarNumber(adnum) {
+        // Check if Aadhaar number is of 12 digits and only contains numerical digits
+        const pattern = /^[0-9]{12}$/;
+        return pattern.test(adnum);
+    }
 
-    const handleFormSubmit = (event) => {
+    const getregPhone = async () => {
+        const response = await instance.get('/regPhones', {
+            params: { uid } // Pass the uid parameter as a query parameter
+        });
+        return response.data;
+        // const regPhone = response.data;
+        // if (regPhone && regPhone.phoneNumber === phoneNumber) {
+        //     console.log(regPhone, " reggggggggggggg111111111")
+        //     return regPhone;
+        // } else {
+        //     alert('Invalid UID or phone number');
+        //     return null;
+        // }
+    };
+    const doRegPhone = () => {
+        const newPerson = {
+            firstName,
+            lastName,
+            phoneNumber,
+            dateOfBirth: dob,
+            aadhaarNumber
+        };
+        // Make a POST request to the '/persons' endpoint with the new person object
+        console.log(newPerson, " nnnnnnnnnnnn")
+        instance.post(`/persons?uid=${uid}`, newPerson).then(() => {
+            // Reset the form state variables
+            setFirstName('');
+            setLastName('');
+            setDob('');
+            setAadhaarNumber('');
+            setAadhaarError('');
+            setShowForm(false);
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        }).catch((error) => {
+            console.log(error, 'erro22222222222')
+        })
+    }
+    const handleFormSubmit = async (event) => {
         event.preventDefault();
-        // TODO: Handle form submit
-        setFirstName('');
-        setLastName('');
-        setDob('');
-        setAadhaarNumber('');
-        setShowForm(false);
+
+        if (!firstName || !lastName || !phoneNumber || !dob || !aadhaarNumber) {
+            alert('All fields are required!');
+            return;
+        }
+        if (!validateAadhaarNumber(aadhaarNumber)) {
+            alert('Please enter a valid Aadhaar number');
+            return;
+        }
+        doRegPhone()
     };
 
     const handleLogout = () => {
         auth.signOut();
     };
-
+    const getAllPerson = async () => {
+        try {
+            console.log(uid, " uidddddddddddddd")
+            const response = await instance.get('/persons', {
+                params: { uid } // Pass the uid parameter as a query parameter
+            });
+            return response.data;
+        } catch (error) {
+            console.error(error);
+        }
+    };
     return (
         <div className="container my-4">
             <div className="row justify-content-center">
@@ -50,13 +121,27 @@ function Dashboard() {
                                 Logout
                             </button>
                         </div>
-                        <div className="card-body">
-                            <div className="mb-3">
-                                <h6>Uid:</h6>
-                                <p>{uid}</p>
-                                <h6>Phone Number:</h6>
-                                <p>{phoneNumber}</p>
-                            </div>
+
+                        <div className="card-body mt-5">
+                            {persons && (
+                                <div className="card-body">
+                                    <div className="row">
+                                        <div className="col-md-12">
+                                            <h6>Phone Number: {phoneNumber}</h6>
+                                            <h6>Number of Persons with this phone number : {persons.length}</h6>
+                                            {persons.map((person) => (
+                                                <div key={person.id} className="card my-3">
+                                                    <div className="card-body">
+                                                        <h6 className="card-title">{person.firstName} {person.lastName}</h6>
+                                                        <p className="card-text">Aadhaar Number: {person.aadhaarNumber}</p>
+                                                        <p className="card-text">Date of Birth: {person.dateOfBirth}</p>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                             <div className="mb-3">
                                 <button
                                     className="btn btn-primary"
@@ -119,16 +204,7 @@ function Dashboard() {
                                                         className="form-control"
                                                         id="aadhaarNumber"
                                                         value={aadhaarNumber}
-                                                        onChange={(event) => {
-                                                            const input = event.target.value;
-                                                            if (/^\d{0,12}$/.test(input)) {
-                                                                setAadhaarNumber(input);
-                                                                setAadhaarError('');
-                                                            } else {
-                                                                setAadhaarNumber(input);
-                                                                setAadhaarError('Please enter a valid Aadhaar number');
-                                                            }
-                                                        }}
+                                                        onChange={(event) => setAadhaarNumber(event.target.value)}
                                                         // maxLength={12}
                                                         required
                                                     />

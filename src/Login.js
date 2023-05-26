@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux';
 import { updateUserData } from './actions';
 import { useNavigate } from "react-router-dom";
 import { Container, Row, Col, Form, Button, Card } from 'react-bootstrap';
+import instance from './axios';
 
 function PhoneAuth() {
     const navigate = useNavigate();
@@ -20,17 +21,21 @@ function PhoneAuth() {
     const signin = (event) => {
         event.preventDefault()
         if (mynumber === "" || mynumber.length < 10) return;
+        try {
+            let verify = new firebase.auth.RecaptchaVerifier('recaptcha-container');
+            auth.signInWithPhoneNumber("+91" + mynumber, verify).then((result) => {
+                setfinal(result);
+                alert("code sent")
+                setshow(true);
+            })
+                .catch((err) => {
+                    alert(err);
+                    window.location.reload()
+                });
+        } catch (error) {
+            console.log(error, " eeeeeeeeeeeeeeeee22222222222222")
+        }
 
-        let verify = new firebase.auth.RecaptchaVerifier('recaptcha-container');
-        auth.signInWithPhoneNumber("+91" + mynumber, verify).then((result) => {
-            setfinal(result);
-            alert("code sent")
-            setshow(true);
-        })
-            .catch((err) => {
-                alert(err);
-                window.location.reload()
-            });
     }
 
     // Validate OTP
@@ -38,14 +43,44 @@ function PhoneAuth() {
         event.preventDefault();
         if (otp === null || final === null)
             return;
-        final.confirm(otp).then((result) => {
-            const uid = result.user.multiFactor.user.uid
-            console.log(uid)
-            dispatch(updateUserData(uid, "+91" + mynumber));
-            navigate('/dashboard');
-        }).catch((err) => {
-            console.log(err)
-        })
+        try {
+            final.confirm(otp)
+                .then((result) => {
+                    const uid = result.user.multiFactor.user.uid;
+                    const phoneNumber = "+91" + mynumber;
+                    console.log(uid);
+                    dispatch(updateUserData(uid, "+91" + mynumber));
+                    navigate('/dashboard');
+                    try {
+                        instance.post('/login', {
+                            uid: uid,
+                            phoneNumber: phoneNumber
+                        })
+                            .then((response) => {
+                                console.log(response.data);
+                                navigate('/dashboard');
+                                setTimeout(() => {
+                                    window.location.reload()
+                                }, 1000);
+                            })
+                            .catch((error) => {
+                                console.error(error);
+                            });
+                    } catch (error) {
+                        if (error.response) {
+                            console.log(error.response.data, " eeee111111111");
+                        } else {
+                            console.log(error.message, " e2222222222222");
+                        }
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        } catch (error) {
+            console.log(error, " eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
+        }
+
     }
 
     return (
