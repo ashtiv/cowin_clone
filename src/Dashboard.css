@@ -1,0 +1,91 @@
+.card-header {
+    background-color: #0072c6;
+}
+
+.text-white {
+    color: #fff;
+}
+
+.card {
+    margin-bottom: 20px;
+    border: none;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.card-title {
+    font-weight: bold;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.btn-cowin-green {
+    background-color: #4caf50;
+    border-color: #4caf50;
+}
+
+.bg-cowin-blue {
+    background-color: #017e7e !important;
+}
+
+.btn-cowin-green:hover {
+    background-color: #3e8e41;
+    border-color: #3e8e41;
+}
+
+.container-fluid {
+    font-family: 'Open Sans', sans-serif;
+}
+
+.form-group label {
+    font-weight: bold;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.form-group input {
+    font-family: 'Open Sans', sans-serif;
+}
+
+.text-danger {
+    color: #dc3545;
+}
+
+.row {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.col-md-6 {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+@media (min-width: 768px) {
+    .col-md-6 {
+        padding-left: 7.5px;
+        padding-right: 7.5px;
+    }
+}
+
+@media (min-width: 992px) {
+    .col-md-6 {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .col-md-6 {
+        padding-left: 12.5px;
+        padding-right: 12.5px;
+    }
+}
+
+@media (min-width: 1400px) {
+    .col-md-6 {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+}

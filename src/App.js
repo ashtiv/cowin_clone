@@ -7,6 +7,8 @@ import { useDispatch } from 'react-redux';
 import { auth } from './firebase';
 import { updateUserData } from './actions';
 import ProtectedDashboard from './ProtectedDashboard';
+import SuperLogin from './SuperLogin';
+import SuperDashboard from './SuperDashboard';
 
 function App() {
   const dispatch = useDispatch();
@@ -33,6 +35,8 @@ function App() {
       <Routes>
         <Route path='/' element={isLoggedIn ? <Navigate to='/dashboard' /> : <Login />} />
         <Route path='/dashboard' element={<ProtectedDashboard />} />
+        <Route path='/superlogin/674384' element={<SuperLogin />} />
+        <Route path='/superdashboard' element={<SuperDashboard />} />
       </Routes>
     </Router>
   );

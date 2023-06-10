@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { Container, Row, Col, Form, Button, Card } from 'react-bootstrap';
 import instance from './axios';
 
-function Login() {
+function SuperLogin() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
@@ -50,27 +50,26 @@ function Login() {
                     const phoneNumber = "+91" + mynumber;
                     console.log(uid);
                     dispatch(updateUserData(uid, "+91" + mynumber));
-                    navigate('/dashboard');
                     try {
-                        instance.post('/login', {
+                        instance.post('/superlogin', {
                             uid: uid,
                             phoneNumber: phoneNumber
                         })
                             .then((response) => {
-                                console.log(response.data);
-                                navigate('/dashboard');
+                                console.log(" sssssss3333333333333333333");
+                                navigate('/superdashboard');
                                 setTimeout(() => {
                                     window.location.reload()
                                 }, 1000);
                             })
                             .catch((error) => {
-                                console.error(error);
+                                console.error(error, " eeeeeee33333333333333");
                             });
                     } catch (error) {
                         if (error.response) {
-                            console.log(error.response.data, " eeee111111111");
+                            console.log(error.response.data, " eeee111111111111111");
                         } else {
-                            console.log(error.message, " e2222222222222");
+                            console.log(error.message, " e2222222222222222222222");
                         }
                     }
                 })
@@ -89,7 +88,7 @@ function Login() {
                 <Col md={6}>
                     <Card>
                         <Card.Body>
-                            <h3 className="text-center mb-4">Login with Phone Number</h3>
+                            <h3 className="text-center mb-4">Admin Login with Phone Number</h3>
                             {!show && <Form onSubmit={signin}>
                                 <Form.Label>Enter your phone number:</Form.Label>
                                 <div className="input-group">
@@ -116,4 +115,4 @@ function Login() {
     );
 }
 
-export default Login;
+export default SuperLogin;
