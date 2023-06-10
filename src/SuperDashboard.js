@@ -62,7 +62,6 @@ function SuperDashboard() {
                 params: { phoneSubstring: phoneNumber },
             })
             .then((response) => {
-                console.log(response, " rrrressssssssssss")
                 setRegPhones(response.data);
             })
             .catch((error) => {
