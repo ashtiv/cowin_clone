@@ -50,14 +50,6 @@ function Dashboard() {
             params: { uid } // Pass the uid parameter as a query parameter
         });
         return response.data;
-        // const regPhone = response.data;
-        // if (regPhone && regPhone.phoneNumber === phoneNumber) {
-        //     console.log(regPhone, " reggggggggggggg111111111")
-        //     return regPhone;
-        // } else {
-        //     alert('Invalid UID or phone number');
-        //     return null;
-        // }
     };
     const doRegPhone = () => {
         const newPerson = {
