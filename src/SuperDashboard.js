@@ -12,9 +12,9 @@ function SuperDashboard() {
     const navigate = useNavigate();
 
     useEffect(() => {
+        // Check if the user is logged in and is a super person
         const unsubscribe = auth.onAuthStateChanged((user) => {
             if (user && user.multiFactor) {
-                // User is logged in, check if they are a super person
                 instance
                     .get("/checksuperuser", {
                         params: {
@@ -22,9 +22,7 @@ function SuperDashboard() {
                         },
                     })
                     .then((response) => {
-                        console.log(response.data.superPerson, " ssssssssssuper");
                         if (response.data.superPerson) {
-                            console.log(" ssssssssss1111111111111111");
                             setIsSuperPerson(true);
                             setLoggedIn(true);
                         } else {
@@ -34,14 +32,12 @@ function SuperDashboard() {
                         }
                     })
                     .catch((error) => {
-                        console.log(" sssssssssssssssss22222222222");
                         console.error(error);
                         setIsSuperPerson(false);
                         setLoggedIn(false);
                         navigate("/");
                     });
             } else {
-                // User is not logged in
                 setIsSuperPerson(false);
                 setLoggedIn(false);
                 navigate("/");
@@ -69,7 +65,11 @@ function SuperDashboard() {
             });
     };
 
-    // Render the super dashboard if the user is logged in and is a super person
+    const handleRegPhoneClick = (uid) => {
+        console.log("Clicked regPhone with uid:", uid);
+        navigate("/regphone", { state: { uid: uid } });
+    };
+
     return (
         <div className="container-fluid my-4">
             <div className="row justify-content-center">
@@ -105,7 +105,14 @@ function SuperDashboard() {
                             {regPhones.length > 0 ? (
                                 <ul>
                                     {regPhones.map((regPhone) => (
-                                        <li key={regPhone.id}>{regPhone.phoneNumber}</li>
+                                        <li key={regPhone.id}>
+                                            <a
+                                                href="#"
+                                                onClick={() => handleRegPhoneClick(regPhone.uid)}
+                                            >
+                                                {regPhone.phoneNumber}
+                                            </a>
+                                        </li>
                                     ))}
                                 </ul>
                             ) : (

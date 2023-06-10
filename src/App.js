@@ -9,6 +9,7 @@ import { updateUserData } from './actions';
 import ProtectedDashboard from './ProtectedDashboard';
 import SuperLogin from './SuperLogin';
 import SuperDashboard from './SuperDashboard';
+import RegPhoneDetails from './RegPhoneDetails';
 
 function App() {
   const dispatch = useDispatch();
@@ -19,7 +20,6 @@ function App() {
       if (user && user.multiFactor) {
         const currentUserUid = user.multiFactor.user.uid;
         const phoneNumber = user.multiFactor.user.phoneNumber;
-        // console.log(user?.multiFactor?.user?.phoneNumber, " uuuuuuuuuuuuuuuu")
         dispatch(updateUserData(currentUserUid, phoneNumber));
         setIsLoggedIn(true);
       } else {
@@ -37,8 +37,10 @@ function App() {
         <Route path='/dashboard' element={<ProtectedDashboard />} />
         <Route path='/superlogin/674384' element={<SuperLogin />} />
         <Route path='/superdashboard' element={<SuperDashboard />} />
+        <Route path='/regphone' element={<RegPhoneDetails />} />
       </Routes>
     </Router>
   );
 }
+
 export default App;
